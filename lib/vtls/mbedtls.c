@@ -190,8 +190,6 @@ static int mbedtls_bio_cf_write(void *bio,
   CURLcode result;
 
   DEBUGASSERT(data);
-  if(!data)
-    return 0;
 
   nwritten = Curl_conn_cf_send(cf->next, data, (char *)buf, blen, FALSE,
                                &result);
@@ -211,8 +209,6 @@ static int mbedtls_bio_cf_read(void *bio, unsigned char *buf, size_t blen)
   CURLcode result;
 
   DEBUGASSERT(data);
-  if(!data)
-    return 0;
   /* OpenSSL catches this case, so should we. */
   if(!buf)
     return 0;
