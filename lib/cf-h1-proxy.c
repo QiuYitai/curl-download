@@ -194,16 +194,14 @@ static void h1_tunnel_go_state(struct Curl_cfilter *cf,
 static void tunnel_free(struct Curl_cfilter *cf,
                         struct Curl_easy *data)
 {
-  if(cf) {
-    struct h1_tunnel_state *ts = cf->ctx;
-    if(ts) {
-      h1_tunnel_go_state(cf, ts, H1_TUNNEL_FAILED, data);
-      Curl_dyn_free(&ts->rcvbuf);
-      Curl_dyn_free(&ts->request_data);
-      Curl_httpchunk_free(data, &ts->ch);
-      free(ts);
-      cf->ctx = NULL;
-    }
+  struct h1_tunnel_state *ts = cf->ctx;
+  if(ts) {
+    h1_tunnel_go_state(cf, ts, H1_TUNNEL_FAILED, data);
+    Curl_dyn_free(&ts->rcvbuf);
+    Curl_dyn_free(&ts->request_data);
+    Curl_httpchunk_free(data, &ts->ch);
+    free(ts);
+    cf->ctx = NULL;
   }
 }
 
@@ -1057,14 +1055,12 @@ static void cf_h1_proxy_close(struct Curl_cfilter *cf,
                               struct Curl_easy *data)
 {
   CURL_TRC_CF(data, cf, "close");
-  if(cf) {
-    cf->connected = FALSE;
-    if(cf->ctx) {
-      h1_tunnel_go_state(cf, cf->ctx, H1_TUNNEL_INIT, data);
-    }
-    if(cf->next)
-      cf->next->cft->do_close(cf->next, data);
+  cf->connected = FALSE;
+  if(cf->ctx) {
+    h1_tunnel_go_state(cf, cf->ctx, H1_TUNNEL_INIT, data);
   }
+  if(cf->next)
+    cf->next->cft->do_close(cf->next, data);
 }
 
 
